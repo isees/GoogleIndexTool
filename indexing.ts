@@ -1,8 +1,17 @@
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // 读取服务账号密钥
-const key = require('./lovector-437304-6e3ab2c8f8d9.json');
+const key = require('./config/key.json');
+
+// 读取URL配置文件
+const urlConfigPath = path.join(__dirname, 'config', 'url.json');
+const urlConfig = JSON.parse(fs.readFileSync(urlConfigPath, 'utf-8'));
+
+// 使用配置文件中的URLs
+const urls = urlConfig.urls;
 
 async function submitUrl(url: string) {
   const jwtClient = new JWT({
@@ -30,10 +39,4 @@ async function submitUrl(url: string) {
 }
 
 // 使用示例
-const urls = [
-  'https://lovector.me/page1',
-  'https://lovector.me/page2',
-  // ... 更多 URL
-];
-
-urls.forEach(url => submitUrl(url));
+urls.forEach((url: string) => submitUrl(url));

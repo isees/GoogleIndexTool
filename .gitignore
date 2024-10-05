@@ -129,4 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-config/*
+# 忽略配置文件
+/config/key.json
+/config/url.json
