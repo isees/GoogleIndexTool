@@ -128,4 +128,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-lovector-437304-6e3ab2c8f8d9.json
+
+config/*
