@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Google Index Tool",
+  "version": "1.0.0",
+  "description": "A tool for managing Google indexing",
+  "action": {
+    "default_popup": "@/pages/popup/index.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://oauth2.googleapis.com/*",
+    "https://indexing.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  }
+}

@@ -1,4 +1,5 @@
 {
   "private_key": "-----BEGIN PRIVATE KEY-----\nexample\n-----END PRIVATE KEY-----\n",
   "client_email": "username@project-id.iam.gserviceaccount.com",
+  "proxy": "socks5h://localhost:5000"
 }
