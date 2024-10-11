@@ -9,12 +9,12 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'src/pages/popup/index.html'),
-        background: resolve(__dirname, 'src/background/index.ts'), // 添加这行
+        background: resolve(__dirname, 'src/background/index.ts'),
       },
       output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name][extname]',
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[hash][extname]',
       },
     },
     emptyOutDir: true,

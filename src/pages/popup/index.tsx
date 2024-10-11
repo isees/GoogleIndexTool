@@ -1,19 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import Popup from '../../components/Popup';
+import { createRoot } from 'react-dom/client';
+import Popup from '@/components/Popup';
+import '@/styles/globals.css'; // 确保导入全局样式
 
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>Google Index Tool</h1>
-      {/* Add your component content here */}
-      <Popup />
-    </div>
-  );
-};
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+const container = document.getElementById('root');
+if (!container) throw new Error('Failed to find the root element');
+const root = createRoot(container);
+root.render(
   <React.StrictMode>
-    <App />
+    <Popup />
   </React.StrictMode>
 );

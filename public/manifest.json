@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "A tool for managing Google indexing",
   "action": {
-    "default_popup": "@/pages/popup/index.html"
+    "default_popup": "src/pages/popup/index.html"
   },
   "permissions": [
     "activeTab",
@@ -15,7 +15,7 @@
     "https://indexing.googleapis.com/*"
   ],
   "background": {
-    "service_worker": "assets/background.js",
+    "service_worker": "background.js",
     "type": "module"
   }
 }

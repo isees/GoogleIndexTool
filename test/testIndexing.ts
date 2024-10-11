@@ -1,9 +1,9 @@
 import { submitUrls } from '@/utils/indexing';
 import { Configuration } from '@/utils/storage';
-import fs from 'fs';
-import JSON5 from 'json5';
+import * as JSON5 from 'json5';
 import { webcrypto } from 'node:crypto';
-import path from 'path';
+import * as path from 'path';
+import * as fs from 'fs';  // 修改这一行
 
 // @ts-ignore
 global.crypto = webcrypto;
@@ -15,14 +15,26 @@ let config: {
     private_key: string;
   };
   test_urls: string[];
-  proxy?: string;
 };
 
 try {
-  const fileContent = fs.readFileSync(path.resolve(__dirname, 'test_data.json'), 'utf-8');
-  config = JSON5.parse(fileContent);
+  console.log(__dirname);
+  const filePath = path.join(__dirname, 'test_data.json');  // 使用 path.join 替代 path.resolve
+  console.log(filePath);
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  console.log('FileContent', JSON.stringify(fileContent));
+
+  // 检查 JSON5 是否正确导入
+  console.log('JSON5 object:', JSON5);
+
+  if (typeof JSON5.parse !== 'function') {
+    throw new Error('JSON5.parse is not a function');
+  }
+
+  config = JSON5.parse(fileContent);  // 使用 JSON5.parse 来解析 JSONC 格式
+  console.log('Parsed config:', JSON.stringify(config, null, 2));
 } catch (error) {
-  console.error('Error reading test_data.json. Make sure you have created this file based on test_data.json.example');
+  console.error('Error reading or parsing test_data.json:', error);
   process.exit(1);
 }
 
