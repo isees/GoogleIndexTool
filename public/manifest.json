@@ -1,21 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Google Index Tool",
+  "name": "Google Index Tool Extension",
   "version": "1.0.0",
-  "description": "A tool for managing Google indexing",
-  "action": {
-    "default_popup": "src/pages/popup/index.html"
-  },
+  "description": "A tool for Google indexing",
   "permissions": [
     "activeTab",
     "storage"
   ],
-  "host_permissions": [
-    "https://oauth2.googleapis.com/*",
-    "https://indexing.googleapis.com/*"
-  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

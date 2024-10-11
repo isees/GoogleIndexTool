@@ -1,6 +1,15 @@
-import JSON5 from 'json5';
+import { Buffer } from 'buffer';
 import jwt from 'jsonwebtoken';
-import { Configuration } from './storage';
+import JSON5 from 'json5';
+
+declare global {
+  interface Window {
+    process: any;
+    Buffer: typeof Buffer;
+  }
+}
+
+import { Configuration } from '@/utils/storage';
 
 const DEBUG = process.env.DEBUG === 'true' || process.env.NODE_ENV === 'development';
 
