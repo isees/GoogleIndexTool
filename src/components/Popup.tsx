@@ -55,7 +55,7 @@ const Popup: React.FC = () => {
         setUrls(lastUrls)
       } catch (error) {
         console.error('Error loading initial data:', error)
-        setSubmitResult(`Error loading initial data: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        setSubmitResult(`Error loading initial data: ${errorToString(error)}`)
       }
     }
     loadInitialData()
@@ -99,7 +99,7 @@ const Popup: React.FC = () => {
       setSubmitResult(JSON.stringify(result, null, 2))
     } catch (error) {
       console.error('Error in handleSubmit:', error)
-      setSubmitResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setSubmitResult(`Error: ${errorToString(error)}`)
     }
   }
 
@@ -141,6 +141,17 @@ const Popup: React.FC = () => {
       </div>
     </ErrorBoundary>
   )
+}
+
+function errorToString(error: unknown): string {
+  console.log('Error object:', error);
+  console.log('Error type:', typeof error);
+  console.log('Is Error instance:', error instanceof Error);
+  if (error instanceof Error) {
+    return error.message
+  } else {
+    return String(error)
+  }
 }
 
 export default Popup

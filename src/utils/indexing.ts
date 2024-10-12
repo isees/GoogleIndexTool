@@ -1,6 +1,5 @@
 import { Buffer } from 'buffer';
-import jwt from 'jsonwebtoken';
-import JSON5 from 'json5';
+import * as jsrsasign from 'jsrsasign';
 
 declare global {
   interface Window {
@@ -32,7 +31,34 @@ async function getAccessToken(config: Configuration): Promise<string> {
   };
 
   try {
-    const jwtToken = jwt.sign(payload, private_key, { algorithm: 'RS256' });
+    log('Payload:', JSON.stringify(payload));
+    log('Private key:', private_key.substring(0, 20) + '...');  // Log only the beginning of the private key for security
+
+    const header = { alg: 'RS256', typ: 'JWT' };
+    const sHeader = JSON.stringify(header);
+    const sPayload = JSON.stringify(payload);
+
+    // 确保私钥格式正确
+    let formattedPrivateKey = private_key;
+    if (!formattedPrivateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+      formattedPrivateKey = `-----BEGIN PRIVATE KEY-----\n${formattedPrivateKey}\n-----END PRIVATE KEY-----`;
+    }
+    formattedPrivateKey = formattedPrivateKey.replace(/\\n/g, '\n');
+
+    log('Formatted private key:', formattedPrivateKey.substring(0, 40) + '...');
+
+    const privateKey = jsrsasign.KEYUTIL.getKey(formattedPrivateKey);
+
+    if (!(privateKey instanceof jsrsasign.RSAKey)) {
+      throw new Error('Invalid private key format');
+    }
+
+    const jwtToken = jsrsasign.KJUR.jws.JWS.sign(
+      'RS256',
+      sHeader,
+      sPayload,
+      privateKey as jsrsasign.RSAKey
+    );
 
     log('Requesting access token with the following configuration:');
     log('Client Email:', client_email);
@@ -57,7 +83,7 @@ async function getAccessToken(config: Configuration): Promise<string> {
     return data.access_token;
   } catch (error) {
     console.error('Error in getAccessToken:', error);
-    throw error;
+    throw new Error(`Failed to get access token: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -73,8 +99,11 @@ export async function submitUrls(config: Configuration, urls: string[]): Promise
 
     return await Promise.all(urls.map(url => submitUrl(url, accessToken)));
   } catch (error) {
-    console.error('Error in submitUrls:', error);
-    throw error;
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error(String(error));
+    }
   }
 }
 
@@ -87,7 +116,7 @@ async function submitUrl(url: string, accessToken: string): Promise<{ url: strin
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
       },
-      body: JSON5.stringify({ url, type: 'URL_UPDATED' }),
+      body: JSON.stringify({ url, type: 'URL_UPDATED' }),
     });
 
     log('URL Submission Response Status:', response.status);
@@ -100,7 +129,7 @@ async function submitUrl(url: string, accessToken: string): Promise<{ url: strin
 
     const data = await response.json();
     log('URL Submission Response:', JSON.stringify(data));
-    return { url, status: 'success', message: `URL submitted successfully: ${JSON5.stringify(data)}` };
+    return { url, status: 'success', message: `URL submitted successfully: ${JSON.stringify(data)}` };
   } catch (error) {
     log('Error submitting URL:', url, error);
     return { url, status: 'error', message: `Error submitting URL: ${error instanceof Error ? error.message : 'Unknown error'}` };
