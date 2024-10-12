@@ -1,0 +1,10 @@
+{
+  "google_api": {
+    "client_email": "your-client-email@your-project.iam.gserviceaccount.com",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nYour Private Key Here\n-----END PRIVATE KEY-----\n"
+  },
+  "test_urls": [
+    "https://example.com/page1",
+    "https://example.com/page2"
+  ]
+}

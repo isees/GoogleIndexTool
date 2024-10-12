@@ -1,20 +1,52 @@
 {
-  "name": "GoogleIndexTool",
+  "name": "google-index-tool-extension",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:dev": "webpack --mode=development --config webpack.config.cjs",
+    "build": "webpack --mode=production --config webpack.config.cjs",
+    "index": "ts-node indexing.ts",
+    "test:indexing": "jest --config jest.config.mjs test/testIndexing.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "google-auth-library": "^9.14.1",
-    "googleapis": "^144.0.0"
+    "jsrsasign": "^11.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.4",
-    "typescript": "^5.6.2"
+    "@types/chrome": "^0.0.277",
+    "@types/jest": "^29.5.13",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/jsrsasign": "^10.5.14",
+    "@types/node": "^16.11.7",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@types/webextension-polyfill": "^0.10.0",
+    "autoprefixer": "^10.4.20",
+    "buffer": "^6.0.3",
+    "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
+    "crypto-browserify": "^3.12.0",
+    "css-loader": "^6.8.1",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "html-webpack-plugin": "^5.6.0",
+    "jest": "^29.7.0",
+    "json5": "^2.2.3",
+    "mini-css-extract-plugin": "^2.9.1",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^8.1.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "style-loader": "^3.3.3",
+    "tailwindcss": "^3.4.13",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.0.2",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   }
 }

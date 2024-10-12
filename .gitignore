@@ -132,3 +132,9 @@ dist
 # 忽略配置文件
 /config/key.json
 /config/url.json
+
+# Cursor rules
+.cursorrules
+
+# 测试配置文件
+test/test_data.json

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Google Index Tool Extension",
+  "version": "1.0.0",
+  "description": "A tool for Google indexing",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
