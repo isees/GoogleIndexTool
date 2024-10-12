@@ -6,6 +6,17 @@ import UrlInput from './UrlInput'
 import { getConfigurations, getLastSelectedConfiguration, setLastSelectedConfiguration, getLastInputUrls, setLastInputUrls, getConfiguration } from '@/utils/storage'
 import { submitUrls } from '@/utils/indexing'
 
+interface FailedUrl {
+  url: string;
+  message: string;
+}
+
+interface SubmitResult {
+  success: number;
+  failed: number;
+  failedUrls: FailedUrl[];
+}
+
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
   constructor(props: { children: React.ReactNode }) {
     super(props)
@@ -37,8 +48,9 @@ const Popup: React.FC = () => {
   const [configurations, setConfigurations] = useState<string[]>([])
   const [selectedConfig, setSelectedConfig] = useState('')
   const [urls, setUrls] = useState('')
-  const [submitResult, setSubmitResult] = useState<string | null>(null)
+  const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null)
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -55,7 +67,11 @@ const Popup: React.FC = () => {
         setUrls(lastUrls)
       } catch (error) {
         console.error('Error loading initial data:', error)
-        setSubmitResult(`Error loading initial data: ${errorToString(error)}`)
+        setSubmitResult({
+          success: 0,
+          failed: 0,
+          failedUrls: []
+        })
       }
     }
     loadInitialData()
@@ -88,20 +104,80 @@ const Popup: React.FC = () => {
       return
     }
     const urlList = urls.split('\n').filter(url => url.trim())
+    setIsLoading(true);
     try {
-      setSubmitResult('Submitting URLs...')
+      setSubmitResult({ success: 0, failed: 0, failedUrls: [] })
 
       const config = await getConfiguration(selectedConfig);
       if (!config) {
         throw new Error('Configuration not found');
       }
       const result = await submitUrls(config, urlList)
-      setSubmitResult(JSON.stringify(result, null, 2))
+
+      const successCount = result.filter(r => r.status === 'success').length
+      const failedResults = result.filter(r => r.status === 'error')
+      const failedCount = failedResults.length
+      const failedUrls = failedResults.map(r => ({
+        url: r.url,
+        message: r.message || 'Unknown error'
+      }))
+
+      setSubmitResult({
+        success: successCount,
+        failed: failedCount,
+        failedUrls: failedUrls
+      })
     } catch (error) {
       console.error('Error in handleSubmit:', error)
-      setSubmitResult(`Error: ${errorToString(error)}`)
+      setSubmitResult({
+        success: 0,
+        failed: urlList.length,
+        failedUrls: urlList.map(url => ({ url, message: errorToString(error) }))
+      })
+    } finally {
+      setIsLoading(false);
     }
   }
+
+  const renderSubmitResult = () => {
+    if (isLoading) {
+      return (
+        <div className="mt-4 p-4 bg-white rounded-lg shadow">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span className="ml-2">Processing URLs...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (!submitResult) return null;
+
+    return (
+      <div className="mt-4 p-4 bg-white rounded-lg shadow">
+        <h2 className="text-xl font-bold mb-2">Submit Result:</h2>
+        <p>Success: {submitResult.success}</p>
+        <p>Failed: {submitResult.failed}</p>
+        {submitResult.failedUrls.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mt-2 mb-1">Failed URLs:</h3>
+            <textarea
+              className="w-full p-2 border rounded"
+              rows={10}
+              readOnly
+              value={submitResult.failedUrls.map(f => `${f.url} - ${f.message}`).join('\n')}
+            />
+            <button
+              onClick={() => navigator.clipboard.writeText(submitResult.failedUrls.map(f => f.url).join('\n'))}
+              className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition duration-300"
+            >
+              Copy Failed URLs
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <ErrorBoundary>
@@ -128,16 +204,13 @@ const Popup: React.FC = () => {
         />
         <button
           onClick={handleSubmit}
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg mt-6 w-full transition duration-300"
+          className={`${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+            } text-white px-6 py-2 rounded-lg mt-6 w-full transition duration-300`}
+          disabled={isLoading}
         >
-          Submit
+          {isLoading ? 'Submitting...' : 'Submit'}
         </button>
-        {submitResult && (
-          <div className="mt-4 p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-bold mb-2">Submit Result:</h2>
-            <pre className="whitespace-pre-wrap overflow-auto max-h-60">{submitResult}</pre>
-          </div>
-        )}
+        {renderSubmitResult()}
       </div>
     </ErrorBoundary>
   )

@@ -129,9 +129,9 @@ async function submitUrl(url: string, accessToken: string): Promise<{ url: strin
 
     const data = await response.json();
     log('URL Submission Response:', JSON.stringify(data));
-    return { url, status: 'success', message: `URL submitted successfully: ${JSON.stringify(data)}` };
+    return { url, status: 'success', message: JSON.stringify(data) };
   } catch (error) {
     log('Error submitting URL:', url, error);
-    return { url, status: 'error', message: `Error submitting URL: ${error instanceof Error ? error.message : 'Unknown error'}` };
+    return { url, status: 'error', message: error instanceof Error ? error.message : String(error) };
   }
 }
